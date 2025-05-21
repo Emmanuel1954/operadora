@@ -31,7 +31,7 @@ public class ReservaProducer {
                 switch (event.getAccion()) {
                     case "CREAR":
                         repository.save(new Reserva(datos.getCliente(), datos.getTour(), datos.getFecha()));
-                        System.out.println("✅ Reserva creada");
+                        System.out.println(" Reserva creada");
                         break;
                     case "ACTUALIZAR":
                         Optional<Reserva> reservaOpt = repository.findById(datos.getId());
@@ -41,21 +41,21 @@ public class ReservaProducer {
                             r.setTour(datos.getTour());
                             r.setFecha(datos.getFecha());
                             repository.save(r);
-                            System.out.println("✅ Reserva actualizada");
+                            System.out.println(" Reserva actualizada");
                         } else {
-                            System.out.println("⚠️ Reserva no encontrada para actualizar");
+                            System.out.println("️ Reserva no encontrada para actualizar");
                         }
                         break;
                     case "ELIMINAR":
                         repository.deleteById(datos.getId());
-                        System.out.println("🗑️ Reserva eliminada");
+                        System.out.println("🗑 Reserva eliminada");
                         break;
                     default:
-                        System.out.println("❓ Acción no reconocida");
+                        System.out.println(" Acción no reconocida");
                 }
 
             } catch (Exception e) {
-                System.err.println("❌ Error al procesar evento: " + e.getMessage());
+                System.err.println(" Error al procesar evento: " + e.getMessage());
             }
         }
     }
