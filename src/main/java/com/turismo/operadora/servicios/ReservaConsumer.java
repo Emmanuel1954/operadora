@@ -22,39 +22,33 @@ public class ReservaConsumer {
     }
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE)
-    public void procesarEvento(String mensaje) {
+    public void procesarEvento(ReservaEvent event) {
         try {
-            ReservaEvent event = mapper.readValue(mensaje, ReservaEvent.class);
             ReservaRequest datos = event.getDatos();
-
             switch (event.getAccion()) {
-                case "CREAR":
+                case "CREAR" -> {
                     repository.save(new Reserva(datos.getCliente(), datos.getTour(), datos.getFecha()));
                     System.out.println(" Reserva creada");
-                    break;
-                case "ACTUALIZAR":
-                    Optional<Reserva> reservaOpt = repository.findById(datos.getId());
-                    if (reservaOpt.isPresent()) {
-                        Reserva r = reservaOpt.get();
-                        r.setCliente(datos.getCliente());
-                        r.setTour(datos.getTour());
-                        r.setFecha(datos.getFecha());
-                        repository.save(r);
-                        System.out.println(" Reserva actualizada");
-                    } else {
-                        System.out.println("⚠ Reserva no encontrada para actualizar");
-                    }
-                    break;
-                case "ELIMINAR":
+                }
+                case "ACTUALIZAR" -> {
+                    repository.findById(datos.getId()).ifPresentOrElse(
+                            r -> {
+                                r.setCliente(datos.getCliente());
+                                r.setTour(datos.getTour());
+                                r.setFecha(datos.getFecha());
+                                repository.save(r);
+                                System.out.println(" Reserva actualizada");
+                            },
+                            () -> System.out.println(" Reserva no encontrada para actualizar")
+                    );
+                }
+                case "ELIMINAR" -> {
                     repository.deleteById(datos.getId());
-                    System.out.println("🗑 Reserva eliminada");
-                    break;
-                default:
-                    System.out.println(" Acción no reconocida");
+                    System.out.println("🗑️ Reserva eliminada");
+                }
+                default -> System.out.println(" Acción no reconocida: " + event.getAccion());
             }
-
         } catch (Exception e) {
             System.err.println(" Error al procesar evento: " + e.getMessage());
         }
-    }
-}
+    }}
